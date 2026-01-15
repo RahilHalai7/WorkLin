@@ -46,6 +46,8 @@ export interface Page {
   parentId?: string; // For nested pages
   isArchived?: boolean;
   isPublic?: boolean;
+  tags?: string[];
+  type?: 'document' | 'canvas' | 'kanban' | string;
   createdAt: Date;
   updatedAt: Date;
   createdBy?: string;

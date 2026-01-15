@@ -3,9 +3,9 @@ import { Block as BlockType } from '../types/workspace';
 import { Trash2, GripVertical, MessageSquare } from 'lucide-react';
 import { BlockTypeSelector } from './BlockTypeSelector';
 // Import the new CommentThread component
-import { CommentThread } from './comments/CommentThread'; 
+import { CommentThread } from './comments/CommentThread';
 // Import helper to check for comments
-import { getCommentCount } from '../lib/firebase/comments'; 
+import { getCommentCount } from '../lib/firebase/comments';
 import { BlockPermissionSelector } from './BlockPermissionSelector';
 import { useWorkspaceStore } from '../store/workspaceStore';
 import { canEditBlock } from '../lib/firebase/block-permissions';
@@ -38,9 +38,10 @@ export const Block: React.FC<BlockProps> = ({
 
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
   const [showComments, setShowComments] = useState(false);
   const [hasComments, setHasComments] = useState(false);
-  
+
   // FIX 1: Add Local State for immediate typing response
   // This prevents the input from freezing if the DB update fails/lags
   const [localText, setLocalText] = useState(() => {
@@ -52,24 +53,23 @@ export const Block: React.FC<BlockProps> = ({
     }
     return '';
   });
-  
+
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Sync local state if props change externally (e.g. from DB load)
   useEffect(() => {
     const currentText = block.text !== undefined ? block.text : (block.content || '');
     // Only update if they are different to avoid cursor jumping
     if (currentText !== localText && !isEditing) {
-        setLocalText(currentText);
+      setLocalText(currentText);
     }
   }, [block.text, block.content, isEditing]);
 
   // Check for existing comments on load
   useEffect(() => {
     const checkComments = async () => {
-        const count = await getCommentCount(block.id);
-        setHasComments(count > 0);
+      const count = await getCommentCount(block.id);
+      setHasComments(count > 0);
     };
     checkComments();
   }, [block.id, showComments]);
@@ -83,11 +83,11 @@ export const Block: React.FC<BlockProps> = ({
   // Auto-resize textarea when localText changes
   useEffect(() => {
     if (block.type !== 'heading1' && block.type !== 'heading2' && block.type !== 'heading3') {
-        const target = inputRef.current as HTMLTextAreaElement;
-        if (target) {
-            target.style.height = 'auto';
-            target.style.height = target.scrollHeight + 'px';
-        }
+      const target = inputRef.current as HTMLTextAreaElement;
+      if (target) {
+        target.style.height = 'auto';
+        target.style.height = target.scrollHeight + 'px';
+      }
     }
   }, [localText, block.type]);
 
@@ -101,7 +101,7 @@ export const Block: React.FC<BlockProps> = ({
       setIsEditing(false);
       onAddBlock();
     }
-    
+
     if (e.key === 'Backspace' && inputRef.current) {
       // Use localText here for instant check
       if (localText === '') {
@@ -109,10 +109,10 @@ export const Block: React.FC<BlockProps> = ({
         onDelete();
       }
     }
-    
+
     // Allow '/' command menu handling here if you add it later
     if (e.key === '/') {
-        // You can add logic here to open a command menu
+      // You can add logic here to open a command menu
     }
   };
 
@@ -120,9 +120,9 @@ export const Block: React.FC<BlockProps> = ({
     const newValue = e.target.value;
     // 1. Update UI immediately
     setLocalText(newValue);
-    
+
     // 2. Sync to DB
-    onUpdate({ 
+    onUpdate({
       text: newValue,
       content: newValue,
     });
@@ -143,9 +143,9 @@ export const Block: React.FC<BlockProps> = ({
 
       case 'ai':
         return (
-          <AIBlock 
-            block={block} 
-            onUpdate={onUpdate} 
+          <AIBlock
+            block={block}
+            onUpdate={onUpdate}
           />
         );
       case 'heading1':
@@ -281,7 +281,7 @@ export const Block: React.FC<BlockProps> = ({
             onChange={(type) => onUpdate({ permissions: { ...block.permissions, type } })}
             readOnly={!canChangePermissions}
           />
-          
+
           <button
             onClick={() => setShowComments(!showComments)}
             className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors ${hasComments || showComments ? 'text-blue-500' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-400'}`}
@@ -308,7 +308,7 @@ export const Block: React.FC<BlockProps> = ({
         {/* Comment Thread Popup */}
         {showComments && (
           <div className="absolute right-0 z-20 mt-2 transform translate-x-full -translate-y-full md:translate-x-0 md:translate-y-2">
-               <CommentThread blockId={block.id} onClose={() => setShowComments(false)} />
+            <CommentThread blockId={block.id} onClose={() => setShowComments(false)} />
           </div>
         )}
       </div>

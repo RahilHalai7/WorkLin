@@ -117,7 +117,8 @@ export const restoreVersion = async (pageId: string, versionId: string, userId: 
     // But here we might want to flag it.
 
     await import('./database').then(async (mod) => {
-        await mod.updatePage(pageId, restoredPage, userId);
+        // Fix: updatePage takes 2 args (pageId, updates)
+        await mod.updatePage(pageId, restoredPage);
     });
 };
 
@@ -166,12 +167,13 @@ export const reconstructPageAtVersion = async (pageId: string, versionId: string
 };
 
 const revertDiff = (page: Page, diff: ChangeDiff): Page => {
-    const reverted = _.cloneDeep(page);
+    const reverted: any = _.cloneDeep(page);
 
     Object.keys(diff).forEach(key => {
         // Diff: { property: { before: "OldVal", after: "NewVal" } }
         // We want to go BACK to "before"
         const k = key as keyof Page;
+        // Fix: Cast to any to avoid complex type mismatch logic for now
         reverted[k] = diff[key].before;
     });
 

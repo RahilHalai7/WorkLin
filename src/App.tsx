@@ -21,6 +21,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/app" element={<Workspace />} />
+        <Route path="/app/search" element={<Workspace />} />
         <Route path="/security" element={<SecuritySettings />} />
         <Route path="/audit-log" element={<AuditLog />} />
         <Route path="*" element={<Navigate to="/" replace />} />
