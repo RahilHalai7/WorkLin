@@ -1,0 +1,65 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+dist-ssr
+build
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment variables
+.env
+.env.local
+.env.production.local
+.env.development.local
+.env.test.local
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.tsbuildinfo
+.cache
+
+# Documentation files (keep README, CONTRIBUTING, GITHUB_ISSUES, SETUP, TROUBLESHOOTING - ignore others)
+DEPENDENCY_UPDATES.md
+PRE_DEPLOYMENT_CHECKLIST.md
+FINAL_STATUS.md
+FIX_IMPORT_ERROR.md
+INSTALL_INSTRUCTIONS.md
+QUICK_START.md
+FIX_ESBUILD_ERROR.md
+QUICK_FIX.md
+START_HERE.md
+HOW_TO_RUN.md
+FINAL_VERIFICATION.md
+PUSH_TO_MAIN.md
+GIT_PUSH_COMMANDS.md
+FINAL_READY.md
+PUSH_CHECKLIST.md
+
+# Batch files (Windows helpers)
+FIX_AND_RUN.bat
