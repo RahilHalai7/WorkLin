@@ -89,6 +89,11 @@ export const useWorkspace = () => {
       updatedAt: new Date(),
     };
 
+    // Auto-seed block removed as per user request
+    if (localStorage.getItem('worklin_local_seeded')) {
+      localStorage.removeItem('worklin_local_seeded');
+    }
+
     setWorkspace(defaultWorkspace);
     setCurrentPageId('1');
   };

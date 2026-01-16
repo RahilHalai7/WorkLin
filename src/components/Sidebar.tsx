@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, Search, Settings, X, FileText, Home, Star, Trash2, Moon, Sun } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Page } from '../types/workspace';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import { useToast } from '../hooks/use-toast';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { IconPicker } from './ui/icon-picker';
 import { usePageSearch } from '../hooks/use-page-search';
@@ -21,11 +24,12 @@ const HighlightedText = ({ text, highlight }: { text: string; highlight: string 
   if (!highlight.trim()) {
     return <span className="truncate">{text}</span>;
   }
+
   const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const parts = text.split(new RegExp(`(${escapedHighlight})`, 'gi'));
   return (
     <span className="truncate">
-      {parts.map((part, i) => 
+      {parts.map((part, i) =>
         part.toLowerCase() === highlight.toLowerCase() ? (
           <span key={i} className="bg-yellow-200 dark:bg-yellow-900/50 text-gray-900 dark:text-gray-100 rounded-[2px] px-0.5">{part}</span>
         ) : (
@@ -46,9 +50,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
   sidebarOpen,
   setSidebarOpen,
 }) => {
+  const { toast } = useToast();
   const { isDark, toggleDarkMode } = useDarkMode();
-  // Using the hook to manage search state and results
   const { searchQuery, setSearchQuery, filteredPages, inputRef } = usePageSearch(pages);
+  const navigate = useNavigate();
+
+  const handleAddPage = () => {
+    onAddPage();
+    toast({
+      title: "Page created",
+      description: "A new page has been added to your workspace.",
+      duration: 3000,
+    });
+  };
+
+  const handleDeletePage = (pageId: string) => {
+    onDeletePage(pageId);
+    toast({
+      title: "Page deleted",
+      description: "The page has been moved to trash.",
+      duration: 3000,
+      variant: "destructive",
+    });
+  };
+
+  const handleSettings = () => {
+    toast({
+      title: "Settings",
+      description: "Workspace settings are coming soon.",
+      duration: 3000,
+    });
+  };
 
   return (
     <>
@@ -83,11 +115,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="p-2 space-y-1">
-          <button onClick={onAddPage} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors group">
+          <button
+            onClick={handleAddPage}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors group"
+          >
             <Plus size={16} className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400" />
             <span>New Page</span>
           </button>
-          <button onClick={() => inputRef.current?.focus()} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors">
+          <button
+            onClick={() => inputRef.current?.focus()}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+          >
             <Search size={16} className="text-gray-500" />
             <span>Search</span>
             <span className="ml-auto text-xs text-gray-400">⌘K</span>
@@ -108,6 +146,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
+        {/* Navigation */}
+        <div className="px-2 pb-2">
+          <div className="space-y-0.5">
+            <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors">
+              <Home size={16} />
+              <span>Home</span>
+            </button>
+            <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors">
+              <Star size={16} />
+              <span>Favorites</span>
+            </button>
+            <button
+              onClick={() => navigate('/app/search')}
+              className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+            >
+              <Search size={16} />
+              <span>Advanced Search</span>
+            </button>
+          </div>
+        </div>
+
         <div className="flex-1 overflow-y-auto px-2">
           <div className="py-2">
             <div className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -118,7 +177,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <FileText size={32} className="mx-auto text-gray-300 dark:text-gray-600 mb-2" />
                 <p className="text-sm text-gray-400 dark:text-gray-500">{searchQuery ? 'No pages found' : 'No pages yet'}</p>
                 {!searchQuery && (
-                  <button onClick={onAddPage} className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                  <button
+                    onClick={handleAddPage}
+                    className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  >
                     Create your first page
                   </button>
                 )}
@@ -129,21 +191,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <motion.div
                     key={page.id}
                     whileHover={{ x: 2 }}
-                    className={`group flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
-                      currentPageId === page.id
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`}
+                    className={`group flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${currentPageId === page.id
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }`}
                     onClick={() => onSelectPage(page.id)}
                   >
                     <div onClick={(e) => e.stopPropagation()}>
-                        <IconPicker onChange={(icon) => onUpdatePage?.(page.id, icon)}>
-                             <span className="text-base flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 rounded p-0.5 transition-colors cursor-pointer">
-                                {page.icon}
-                             </span>
-                        </IconPicker>
+                      <IconPicker onChange={(icon) => onUpdatePage?.(page.id, icon)}>
+                        <span className="text-base flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 rounded p-0.5 transition-colors cursor-pointer">
+                          {page.icon}
+                        </span>
+                      </IconPicker>
                     </div>
-                    
+
                     <span className="flex-1 text-sm font-medium truncate">
                       <HighlightedText text={page.title} highlight={searchQuery} />
                     </span>
@@ -151,7 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDeletePage(page.id);
+                        handleDeletePage(page.id);
                       }}
                       className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-all text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                     >
@@ -164,12 +225,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
+        {/* Footer */}
         <div className="border-t border-gray-200 dark:border-gray-800 p-2 space-y-1">
-          <button onClick={toggleDarkMode} className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors">
+          <button
+            onClick={toggleDarkMode}
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+          >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
             <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
           </button>
-          <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors">
+
+          <button
+            onClick={handleSettings}
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+          >
             <Settings size={16} />
             <span>Settings</span>
           </button>
