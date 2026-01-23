@@ -10,7 +10,7 @@ import { useWorkspace } from '../hooks/useWorkspace';
 import { Menu } from 'lucide-react';
 import { Toaster } from '../components/ui/toaster';
 import { PageHeader } from '../components/PageHeader';
-import { subscribeToAuth } from '../lib/firebase/auth';
+import { subscribeToAuth, getCurrentUser } from '../lib/firebase/auth';
 
 export const Workspace: React.FC = () => {
   const navigate = useNavigate();
@@ -44,13 +44,40 @@ export const Workspace: React.FC = () => {
 
   // Check if user is logged in (Firebase auth)
   useEffect(() => {
+    // Check current user immediately (synchronous check)
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      setAuthChecked(true);
+    }
+    
+    let timeoutId: NodeJS.Timeout;
+    
+    // Also subscribe to auth changes (for logout/login events)
     const unsubscribe = subscribeToAuth((user) => {
       setAuthChecked(true);
+      if (timeoutId) clearTimeout(timeoutId);
       if (!user) {
         navigate('/login');
       }
     });
-    return () => unsubscribe();
+    
+    // Fallback timeout - if auth doesn't respond in 2 seconds, proceed anyway
+    // This prevents infinite loading if Firebase has issues
+    timeoutId = setTimeout(() => {
+      if (!authChecked) {
+        console.warn('Auth check timeout - proceeding anyway');
+        setAuthChecked(true);
+        // If no user after timeout, redirect to login
+        if (!getCurrentUser()) {
+          navigate('/login');
+        }
+      }
+    }, 2000);
+    
+    return () => {
+      unsubscribe();
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [navigate]);
 
   // Show loading state while checking authentication
