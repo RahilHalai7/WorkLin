@@ -21,6 +21,11 @@ export default defineConfig({
   // Base URL for the app
   base: '/',
 
+  // Build configuration
+  build: {
+    outDir: 'dist',
+  },
+
   // Development server configuration
   server: {
     port: 3000,
