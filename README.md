@@ -72,6 +72,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ```
 Email: demo@worklin.com
 Password: demo123
+
+**Test User Credentials:**
+Email: test@worklin.local
+Password: Password123!
 ```
 
 **Quick Start:**
