@@ -124,7 +124,7 @@ WorkLin uses Cloudinary for image storage (free tier with 25GB).
    VITE_CLOUDINARY_UPLOAD_PRESET=worklin_upload
    ```
 
-Cloudinary setup is straightforward - just sign up, get your credentials, and add them to `.env`.
+See [MIGRATE_TO_CLOUDINARY.md](MIGRATE_TO_CLOUDINARY.md) for detailed setup instructions.
 
 #### 3. Render Setup (Optional - For Real-time Collaboration)
 
@@ -135,7 +135,7 @@ For real-time collaboration features, deploy the Yjs server on Render (free tier
 3. Connect your GitHub repository
 4. Configure:
    - **Root Directory**: `yjs-server`
-   - **Build Command**: `npm install --include=optional` (important: includes optional dependencies)
+   - **Build Command**: `npm install`
    - **Start Command**: `node server.js`
    - **Plan**: Free
 5. Get your WebSocket URL (e.g., `wss://your-app.onrender.com`)
@@ -146,7 +146,7 @@ For real-time collaboration features, deploy the Yjs server on Render (free tier
 
 **Note**: Collaboration is optional. The app works perfectly without it!
 
-**⚠️ Important**: The build command must include `--include=optional` to install Rollup native modules required for Vite builds on Linux systems.
+See [YJS_SERVER_SETUP.md](YJS_SERVER_SETUP.md) for detailed setup instructions.
 
 #### 4. Google Gemini API Setup (Optional - For AI Features)
 
@@ -168,7 +168,7 @@ WorkLin includes AI writing assistance powered by Google Gemini.
 
 **Note**: The API key is used directly in the frontend. For production, set `VITE_GEMINI_API_KEY` in your hosting platform's environment variables (Vercel, Netlify, etc.).
 
-The API key setup is simple - just get your key from Google AI Studio and add it to `.env`.
+See [GEMINI_API_SETUP.md](GEMINI_API_SETUP.md) for detailed setup instructions.
 
 ## 📦 Available Scripts
 
@@ -203,7 +203,7 @@ npm run lint
 - **Authentication**: Firebase Auth
 - **Storage**: Cloudinary (25GB free tier) - Image and file storage
 - **Functions**: Firebase Cloud Functions
-- **Hosting**: Firebase Hosting, Vercel (✅ configured), or Render (✅ configured)
+- **Hosting**: Firebase Hosting, Vercel, or Render
 - **Collaboration Server**: Render (free tier) - Yjs WebSocket server
 
 ### Collaboration
@@ -240,9 +240,8 @@ worklin/
 │   ├── types/               # TypeScript types
 │   └── styles/              # Global styles
 ├── public/                  # Static assets
-├── .npmrc                   # npm configuration for optional dependencies
-├── render.yaml              # Render deployment configuration
-├── vercel.json              # Vercel deployment configuration
+├── env.example              # Environment variables template
+├── GITHUB_ISSUES.md         # 30 open source issues
 ├── package.json
 ├── vite.config.ts
 └── tsconfig.json
@@ -323,8 +322,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [x] Login page with demo credentials
 - [x] Responsive design (mobile-friendly)
 - [x] Dark mode support
-- [x] Vercel deployment configuration
-- [x] Render deployment configuration
 - [ ] Real-time collaboration (Yjs + Render) - See Issue #21
 - [ ] AI writing assistant - See Issue #23
 - [ ] Database views - See Issue #14
@@ -335,38 +332,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Mobile app/PWA - See Issue #25
 
 **Check [GITHUB_ISSUES.md](GITHUB_ISSUES.md) for 30 open issues ready for contributors!**
-
-## 🔧 Recent Fixes & Updates
-
-### ✅ Fixed Issues (January 2025)
-
-1. **Vercel MIME Type Error - RESOLVED** ✅
-   - **Issue**: JavaScript modules were being served with `text/html` MIME type instead of `application/javascript`
-   - **Error**: "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of 'text/html'"
-   - **Solution**: Updated `vercel.json` to only rewrite HTML requests, allowing static assets (JS, CSS) to be served with correct MIME types
-   - **Files Changed**: `vercel.json`
-   - **Status**: ✅ Fixed and deployed
-
-2. **Render Deployment Build Error - RESOLVED** ✅
-   - **Issue**: Rollup native module `@rollup/rollup-linux-x64-gnu` not found during build on Render
-   - **Error**: "Cannot find module @rollup/rollup-linux-x64-gnu"
-   - **Solution**: 
-     - Created `.npmrc` to ensure optional dependencies are installed
-     - Added `render.yaml` with proper build configuration
-     - Updated build command to include `--include=optional` flag
-   - **Files Changed**: `.npmrc`, `render.yaml`
-   - **Status**: ✅ Fixed - Ready for deployment
-
-3. **Deployment Configurations Added** ✅
-   - Added Vercel configuration for proper SPA routing
-   - Added Render configuration for Yjs server deployment
-   - Both platforms now properly configured for production deployment
-
-### 📝 Deployment Notes
-
-- **Vercel**: Configured with proper rewrite rules for client-side routing
-- **Render**: Configured with build commands that handle optional dependencies
-- Both platforms are now production-ready
 
 ## 🙏 Acknowledgments
 
